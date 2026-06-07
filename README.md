@@ -6,6 +6,9 @@ A minimal status line script for [Claude Code](https://claude.ai/code) that surf
 Grapla  main  Sonnet 4.6:low  ctx:82k/200k (41%)  5h:34%  7d:⚠ 96%
 ```
 
+<img width="459" height="148" alt="Screenshot 2026-06-07 at 15 36 14" src="https://github.com/user-attachments/assets/cad6f06b-a4e4-469a-aa20-e5421fc7bc37" />
+
+
 ## What it shows
 
 | Segment | Source |
