@@ -26,14 +26,19 @@ CTX_USED_K=$(echo "$CTX_USED" | awk '{printf "%dk", $1/1000}')
 CTX_MAX_K=$(echo "$CTX_MAX" | awk '{printf "%dk", $1/1000}')
 
 CTX_DISPLAY="${CTX_USED_K}/${CTX_MAX_K} (${CTX_PCT}%)"
-[ "$CTX_PCT" -ge 80 ] 2>/dev/null && CTX_DISPLAY="⚠ ${CTX_DISPLAY}"
-[ "$EXCEEDS" = "true" ] && CTX_DISPLAY="🚨 ${CTX_DISPLAY}"
+[ "$CTX_USED" -ge 150000 ] 2>/dev/null && CTX_DISPLAY=$'\033[0;33m'"⚠ ${CTX_DISPLAY}"$'\033[0m'
+[ "$CTX_USED" -ge 200000 ] 2>/dev/null && CTX_DISPLAY=$'\033[0;31m'"🚨 ${CTX_DISPLAY}"$'\033[0m'
+
+FIVE_H_DISPLAY="${FIVE_H}%"
+[ "$FIVE_H" -ge 80 ] 2>/dev/null && FIVE_H_DISPLAY=$'\033[0;33m'"⚠ ${FIVE_H}%"$'\033[0m'
+[ "$FIVE_H" -ge 90 ] 2>/dev/null && FIVE_H_DISPLAY=$'\033[0;31m'"⚠ ${FIVE_H}%"$'\033[0m'
 
 SEVEN_D_DISPLAY="${SEVEN_D}%"
-[ "$SEVEN_D" -ge 90 ] 2>/dev/null && SEVEN_D_DISPLAY="⚠ ${SEVEN_D}%"
+[ "$SEVEN_D" -ge 80 ] 2>/dev/null && SEVEN_D_DISPLAY=$'\033[0;33m'"⚠ ${SEVEN_D}%"$'\033[0m'
+[ "$SEVEN_D" -ge 90 ] 2>/dev/null && SEVEN_D_DISPLAY=$'\033[0;31m'"⚠ ${SEVEN_D}%"$'\033[0m'
 
 PARTS="$REPO"
 [ -n "$BRANCH" ] && PARTS="$PARTS  $BRANCH"
-PARTS="$PARTS  $MODEL:$EFFORT  ctx:$CTX_DISPLAY  5h:${FIVE_H}%  7d:$SEVEN_D_DISPLAY"
+PARTS="$PARTS  $MODEL:$EFFORT  ctx:$CTX_DISPLAY  5h:$FIVE_H_DISPLAY  7d:$SEVEN_D_DISPLAY"
 
-echo "$PARTS"
+printf "%b\n" "$PARTS"
