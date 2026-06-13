@@ -3,7 +3,7 @@
 A minimal status line script for [Claude Code](https://claude.ai/code) that surfaces the session data you actually care about — styled as a phosphor HUD.
 
 ```
-Grapla │ ⎇ main │ ⌬ opus·low │ ▓ 9% 93k/1M │ ◷ 5h 55% 47m │ ◷ 7d 6% 3d9h
+Grapla │ ⎇ main ↑2 ●3 +120 -40 │ ⌬ opus·low │ ▓ 9% 93k/1M │ ◷ 5h 55% 47m │ ◷ 7d 6% 3d9h
 ```
 
 Dim-grey labels and separators, bright phosphor values, glyph icons, and colour that shifts **green → amber → red** as each meter fills.
@@ -14,10 +14,19 @@ Dim-grey labels and separators, bright phosphor values, glyph icons, and colour 
 |---|---|---|
 | Repo name | — | `workspace.repo.name` (falls back to cwd) |
 | Git branch | `⎇` | `git branch --show-current` |
+| Working-tree stats | `↑↓ ● +-` | ahead/behind, dirty count, LOC churn (see below) |
 | Model + effort | `⌬` | `model.display_name` (first word) + `effort.level` |
 | Context usage | `▓` | `used_percentage` + `total_input_tokens / context_window_size` |
 | 5-hour rate limit | `◷` | `rate_limits.five_hour` — used % + time until reset |
 | 7-day rate limit | `◷` | `rate_limits.seven_day` — used % + time until reset |
+
+### Working-tree stats
+
+Appended after the branch name when you're inside a git repo. Each piece is **hidden when there's nothing to report**, so a clean, in-sync tree shows just the branch:
+
+- **`↑N` / `↓N`** — commits ahead of / behind the upstream branch (`git rev-list --count --left-right @{u}...HEAD`). Catches unpushed work or a moved upstream before it bites.
+- **`●N`** — dirty file count: modified + untracked (`git status --porcelain`), amber.
+- **`+N` / `−N`** — LOC churn vs HEAD (`git diff --shortstat HEAD`), green adds / red deletes.
 
 ### Reset timers
 

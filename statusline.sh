@@ -41,6 +41,28 @@ SEVEN_D_RESET=$(echo "$DATA" | jq -r '.rate_limits.seven_day.resets_at // "?"')
 
 BRANCH=$(git -C "${PWD}" branch --show-current 2>/dev/null)
 
+# Git working-tree stats (only when inside a repo). Clean state shows nothing extra.
+GIT_EXTRA=""
+if [ -n "$BRANCH" ]; then
+  # Ahead/behind upstream: "↑2↓1" (omitted when no upstream or in sync).
+  AB=$(git -C "${PWD}" rev-list --count --left-right '@{u}...HEAD' 2>/dev/null)
+  if [ -n "$AB" ]; then
+    BEHIND=$(printf '%s' "$AB" | awk '{print $1}')
+    AHEAD=$(printf '%s' "$AB" | awk '{print $2}')
+    [ "$AHEAD" -gt 0 ] 2>/dev/null && GIT_EXTRA="${GIT_EXTRA} ${AMBER}↑${AHEAD}${RESET}"
+    [ "$BEHIND" -gt 0 ] 2>/dev/null && GIT_EXTRA="${GIT_EXTRA} ${AMBER}↓${BEHIND}${RESET}"
+  fi
+  # Dirty file count: "●3" (modified + untracked), amber, hidden when clean.
+  DIRTY=$(git -C "${PWD}" status --porcelain 2>/dev/null | grep -c .)
+  [ "$DIRTY" -gt 0 ] 2>/dev/null && GIT_EXTRA="${GIT_EXTRA} ${AMBER}●${DIRTY}${RESET}"
+  # LOC churn vs HEAD: "+120 -40", hidden when no change.
+  SHORTSTAT=$(git -C "${PWD}" diff --shortstat HEAD 2>/dev/null)
+  INS=$(printf '%s' "$SHORTSTAT" | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+')
+  DEL=$(printf '%s' "$SHORTSTAT" | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+')
+  [ -n "$INS" ] && [ "$INS" -gt 0 ] 2>/dev/null && GIT_EXTRA="${GIT_EXTRA} ${GREEN}+${INS}${RESET}"
+  [ -n "$DEL" ] && [ "$DEL" -gt 0 ] 2>/dev/null && GIT_EXTRA="${GIT_EXTRA} ${RED}-${DEL}${RESET}"
+fi
+
 # Short model token: first word, lowercased ("Opus 4.8 (1M context)" → "opus").
 MODEL_SHORT=$(echo "$MODEL" | awk '{print tolower($1)}')
 
@@ -86,7 +108,7 @@ SEVEN_COL=$(colour_for_pct "$SEVEN_D")
 
 SEG_REPO="${WHITE}${REPO}${RESET}"
 SEG_BRANCH=""
-[ -n "$BRANCH" ] && SEG_BRANCH="${DIM}${GLYPH_BRANCH} ${AMBER}${BRANCH}${RESET}"
+[ -n "$BRANCH" ] && SEG_BRANCH="${DIM}${GLYPH_BRANCH} ${AMBER}${BRANCH}${RESET}${GIT_EXTRA}"
 SEG_MODEL="${DIM}${GLYPH_MODEL} ${CYAN}${MODEL_SHORT}${DIM}·${CYAN}${EFFORT}${RESET}"
 SEG_CTX="${DIM}${GLYPH_CTX} ${CTX_COL}${CTX_PCT}% ${DIM}${CTX_USED_K}/${CTX_MAX_K}${RESET}"
 SEG_5H="${DIM}${GLYPH_TIMER} 5h ${FIVE_COL}${FIVE_H}% ${DIM}${FIVE_H_REMAIN}${RESET}"
