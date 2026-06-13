@@ -6,6 +6,8 @@ A minimal status line script for [Claude Code](https://claude.ai/code) that surf
 Grapla │ ⎇ main ↑2 ●3 +120 -40 │ ⌬ opus·low │ ▓ 9% 93k/1M │ ◷ 5h 55% 47m │ ◷ 7d 6% 3d9h
 ```
 
+> "hey claude, use https://github.com/conorluddy/claudaline and adapt it for my workflow"
+
 Dim-grey labels and separators, bright phosphor values, glyph icons, and colour that shifts **green → amber → red** as each meter fills.
 
 ## What it shows
